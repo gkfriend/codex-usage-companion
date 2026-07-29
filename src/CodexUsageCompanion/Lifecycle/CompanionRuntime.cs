@@ -23,6 +23,7 @@ public sealed class CompanionRuntime : IAsyncDisposable
     private Task? _refreshSignalTask;
     private DateTimeOffset? _codexMissingSince;
     private bool _hasUsageState;
+    private bool _windowUnavailable;
 
     public CompanionRuntime(ResidentLease lease, CompanionSettings? settings = null, UiText? text = null)
     {
@@ -45,6 +46,7 @@ public sealed class CompanionRuntime : IAsyncDisposable
     public void Start(Application application)
     {
         _application = application;
+        CompanionLog.Shared.Write("lifecycle", "resident-started");
         _windowTimer.Start();
         _fallbackRefreshTimer.Start();
         _refreshSignalTask = Task.Run(WatchRefreshSignal);
@@ -83,6 +85,7 @@ public sealed class CompanionRuntime : IAsyncDisposable
                 await _refreshCoordinator.DisposeAsync();
                 await _appServerClient.DisposeAsync();
                 _cancellation.Dispose();
+                CompanionLog.Shared.Write("lifecycle", "resident-stopped");
             });
     }
 
@@ -91,15 +94,42 @@ public sealed class CompanionRuntime : IAsyncDisposable
         var owner = _windowLocator.Find();
         if (owner is not null)
         {
+            if (_windowUnavailable)
+            {
+                CompanionLog.Shared.Write("lifecycle", "window-restored");
+            }
+
+            _windowUnavailable = false;
             _codexMissingSince = null;
             _window.AttachAndPosition(owner);
             return;
         }
 
         _window.Hide();
-        _codexMissingSince ??= DateTimeOffset.UtcNow;
-        if (CompanionLifetime.ShouldExit(_codexMissingSince.Value, DateTimeOffset.UtcNow))
+        if (!_windowUnavailable)
         {
+            _windowUnavailable = true;
+            CompanionLog.Shared.Write("lifecycle", "window-unavailable");
+        }
+
+        var now = DateTimeOffset.UtcNow;
+        var codexRunning = _windowLocator.IsCodexRunning();
+        var previousMissingSince = _codexMissingSince;
+        var lifetime = CompanionLifetime.Evaluate(codexRunning, previousMissingSince, now);
+        _codexMissingSince = lifetime.ProcessMissingSince;
+        if (codexRunning)
+        {
+            return;
+        }
+
+        if (previousMissingSince is null)
+        {
+            CompanionLog.Shared.Write("lifecycle", "codex-process-missing");
+        }
+
+        if (lifetime.ShouldExit)
+        {
+            CompanionLog.Shared.Write("lifecycle", "resident-exit reason=codex-process-missing");
             _application?.Shutdown();
         }
     }

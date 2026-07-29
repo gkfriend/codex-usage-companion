@@ -27,4 +27,26 @@ public sealed class CompanionLogTests
             }
         }
     }
+
+    [Fact]
+    public void WritesLifecycleMessage()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"CodexUsageCompanionTests-{Guid.NewGuid():N}");
+        try
+        {
+            var log = new CompanionLog(directory);
+
+            log.Write("lifecycle", "resident-started");
+
+            var text = File.ReadAllText(Path.Combine(directory, "companion.log"));
+            Assert.Contains("[lifecycle] resident-started", text);
+        }
+        finally
+        {
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, true);
+            }
+        }
+    }
 }
