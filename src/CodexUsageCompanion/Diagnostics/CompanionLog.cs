@@ -23,9 +23,19 @@ public sealed class CompanionLog
 
     public static CompanionLog Shared { get; } = new();
 
+    public void Write(string area, string message)
+    {
+        WriteEntry($"{DateTimeOffset.Now:O} [{area}] {message}{Environment.NewLine}");
+    }
+
     public void Write(string area, Exception exception)
     {
         var entry = $"{DateTimeOffset.Now:O} [{area}] {exception.GetType().Name}: {exception.Message}{Environment.NewLine}{exception.StackTrace}{Environment.NewLine}";
+        WriteEntry(entry);
+    }
+
+    private void WriteEntry(string entry)
+    {
         lock (_sync)
         {
             try
