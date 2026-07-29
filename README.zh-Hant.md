@@ -4,6 +4,12 @@
 
 Codex Usage Companion 是開放原始碼 Windows 外掛，會在 Codex Desktop 右下角顯示簡潔的剩餘使用量面板。
 
+## 畫面預覽
+
+| English | 繁體中文 | 简体中文 |
+| --- | --- | --- |
+| ![英文使用量面板](assets/screenshots/overlay-en.png) | ![繁體中文使用量面板](assets/screenshots/overlay-zh-Hant.png) | ![簡體中文使用量面板](assets/screenshots/overlay-zh-Hans.png) |
+
 ## 功能
 
 - Codex 回覆後透過本機通知更新，並每分鐘進行一次備援更新。

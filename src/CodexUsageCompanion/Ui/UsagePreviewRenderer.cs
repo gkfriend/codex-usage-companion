@@ -2,13 +2,15 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using CodexUsageCompanion.Configuration;
+using CodexUsageCompanion.Localization;
 using CodexUsageCompanion.RateLimits;
 
 namespace CodexUsageCompanion.Ui;
 
 public static class UsagePreviewRenderer
 {
-    public static void Render(string outputPath)
+    public static void Render(string outputPath, string? language = null)
     {
         var fiveHourReset = new DateTimeOffset(2026, 7, 10, 23, 33, 0, TimeSpan.FromHours(8));
         var weeklyReset = new DateTimeOffset(2026, 7, 17, 0, 0, 0, TimeSpan.FromHours(8));
@@ -16,7 +18,9 @@ public static class UsagePreviewRenderer
             new RateLimitWindowState(51, 300, fiveHourReset.ToUnixTimeSeconds()),
             new RateLimitWindowState(58, 10080, weeklyReset.ToUnixTimeSeconds()),
             null);
-        var window = new UsageOverlayWindow();
+        var settings = new CompanionSettings { Language = language ?? "auto" };
+        var text = UiText.For(UiLanguageResolver.Resolve(settings.Language, System.Globalization.CultureInfo.CurrentUICulture));
+        var window = new UsageOverlayWindow(settings, text);
         window.UpdateUsage(state);
         var content = (FrameworkElement)window.Content;
         var size = new Size(window.Width, window.Height);
