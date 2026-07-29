@@ -30,6 +30,15 @@ Release 已包含所需執行環境，不必另外安裝 .NET Runtime。
 
 ## 從 GitHub 安裝
 
+> [!TIP]
+> **不想閱讀完整說明？**
+>
+> 直接把 `https://github.com/gkfriend/codex-usage-companion` 貼給 Codex，然後告訴它：
+>
+> 「請閱讀這個專案的安裝說明，幫我安裝並啟用 Codex Usage Companion。」
+>
+> Codex 會協助完成大部分安裝步驟。若出現權限或 `/hooks` 信任確認，依畫面核准即可。
+
 執行：
 
 ```powershell

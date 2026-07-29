@@ -30,6 +30,15 @@ The Release build is self-contained and does not require a separate .NET runtime
 
 ## Install from GitHub
 
+> [!TIP]
+> **Don’t want to read the full instructions?**
+>
+> Paste `https://github.com/gkfriend/codex-usage-companion` into Codex and say:
+>
+> “Please read this project’s installation instructions, then install and enable Codex Usage Companion for me.”
+>
+> Codex can handle most of the installation. If a permission request or `/hooks` trust confirmation appears, review and approve it to continue.
+
 Run:
 
 ```powershell
