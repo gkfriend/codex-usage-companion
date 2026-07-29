@@ -4,6 +4,12 @@
 
 Codex Usage Companion is an open-source Windows plugin that keeps Codex rate-limit usage visible in a compact panel attached to Codex Desktop.
 
+## Preview
+
+| English | 繁體中文 | 简体中文 |
+| --- | --- | --- |
+| ![English usage overlay](assets/screenshots/overlay-en.png) | ![Traditional Chinese usage overlay](assets/screenshots/overlay-zh-Hant.png) | ![Simplified Chinese usage overlay](assets/screenshots/overlay-zh-Hans.png) |
+
 ## Features
 
 - Updates after Codex responses through local rate-limit notifications, with a one-minute recovery refresh.

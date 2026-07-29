@@ -102,7 +102,7 @@ public static class Program
             return 2;
         }
 
-        UsagePreviewRenderer.Render(arguments[1]);
+        UsagePreviewRenderer.Render(arguments[1], arguments.Count > 2 ? arguments[2] : null);
         return 0;
     }
 }
