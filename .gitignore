@@ -1,0 +1,12 @@
+.codegraph/
+.vs/
+artifacts/
+dist/
+outputs/
+package/
+docs/plans/
+**/bin/
+**/obj/
+*.pdb
+*.user
+*.suo

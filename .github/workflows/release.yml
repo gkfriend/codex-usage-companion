@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore CodexUsageCompanion.slnx
+      - run: pwsh -File scripts/build.ps1
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets = @(Get-ChildItem -LiteralPath artifacts -File | Where-Object { $_.Extension -in '.zip', '.sha256' } | ForEach-Object { $_.FullName })
+          gh release create $env:GITHUB_REF_NAME @assets --generate-notes --title "Codex Usage Companion $env:GITHUB_REF_NAME"
+      - name: Publish marketplace branch
+        shell: pwsh
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP 'codex-usage-companion-marketplace'
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
+          Copy-Item -Path 'artifacts/marketplace/*' -Destination $staging -Recurse -Force
+          git switch --orphan marketplace-build
+          Get-ChildItem -Force | Where-Object { $_.Name -ne '.git' } | Remove-Item -Recurse -Force
+          Copy-Item -Path "$staging/*" -Destination . -Recurse -Force
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "Publish marketplace $env:GITHUB_REF_NAME"
+          git push origin HEAD:marketplace --force

@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CodexUsageCompanion/CodexUsageCompanion.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CodexUsageCompanion.Tests/CodexUsageCompanion.Tests.csproj" />
+  </Folder>
+</Solution>

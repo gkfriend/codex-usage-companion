@@ -1,0 +1,22 @@
+{
+  "name": "codex-usage-companion",
+  "interface": {
+    "displayName": "Codex Usage Companion"
+  },
+  "plugins": [
+    {
+      "name": "codex-usage-companion",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/gkfriend/codex-usage-companion.git",
+        "path": "./plugins/codex-usage-companion",
+        "ref": "marketplace"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

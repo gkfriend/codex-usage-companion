@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore CodexUsageCompanion.slnx
+      - run: dotnet test CodexUsageCompanion.slnx --configuration Debug --no-restore -p:TreatWarningsAsErrors=true
+      - run: dotnet test CodexUsageCompanion.slnx --configuration Release --no-restore -p:TreatWarningsAsErrors=true
+      - name: Vulnerability audit
+        shell: pwsh
+        run: |
+          $result = dotnet list CodexUsageCompanion.slnx package --vulnerable --include-transitive
+          $result
+          if ($result -match 'has the following vulnerable packages') { exit 1 }
+      - run: pwsh -File scripts/build.ps1 -SkipTests
+      - uses: actions/upload-artifact@v4
+        with:
+          name: codex-usage-companion
+          path: |
+            artifacts/*.zip
+            artifacts/*.sha256
