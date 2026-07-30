@@ -46,7 +46,7 @@ Run:
 codex plugin marketplace add gkfriend/codex-usage-companion
 ```
 
-Open the Codex Plugins directory, select **Codex Usage Companion**, review and trust the bundled `SessionStart` hook, then install and enable it. Start a new Codex task after installation.
+Open the Codex Plugins directory, select **Codex Usage Companion**, review and trust both bundled Hooks (`SessionStart` and `Stop`), then install and enable it. Start a new Codex task after installation. After every upgrade, open `/hooks` and trust the current definitions again if Codex asks for confirmation.
 
 Alternatively, download the marketplace ZIP from GitHub Releases, extract it, and add the extracted folder with `codex plugin marketplace add <folder>`.
 

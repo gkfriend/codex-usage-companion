@@ -46,7 +46,7 @@ Release 已包含所需執行環境，不必另外安裝 .NET Runtime。
 codex plugin marketplace add gkfriend/codex-usage-companion
 ```
 
-開啟 Codex 外掛目錄，選擇 **Codex Usage Companion**，檢視並信任內含的 `SessionStart` Hook，然後安裝並啟用。安裝後請開啟新的 Codex 對話。
+開啟 Codex 外掛目錄，選擇 **Codex Usage Companion**，檢視並信任內含的兩個 Hook（`SessionStart` 與 `Stop`），然後安裝並啟用。安裝後請開啟新的 Codex 對話。每次更新後，若 Codex 再次要求確認，請開啟 `/hooks` 並重新信任目前的 Hook 定義。
 
 也可以從 GitHub Releases 下載 Marketplace ZIP，解壓縮後執行 `codex plugin marketplace add <資料夾>`。
 

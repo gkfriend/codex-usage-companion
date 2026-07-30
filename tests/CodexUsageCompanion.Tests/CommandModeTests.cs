@@ -24,9 +24,11 @@ public sealed class CommandModeTests
     }
 
     [Fact]
-    public void DetachedLauncherCreatesBreakawayBackgroundRequestInsideJob()
+    public void DetachedLauncherCreatesBreakawayBackgroundRequestWhenAllowed()
     {
-        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", true);
+        var request = DetachedLauncher.CreateRequest(
+            @"C:\Tools\CodexUsageCompanion.exe",
+            JobBreakawayPolicy.ExplicitBreakawayAllowed);
 
         Assert.Equal(@"C:\Tools\CodexUsageCompanion.exe", request.ExecutablePath);
         Assert.Equal("\"C:\\Tools\\CodexUsageCompanion.exe\" --background", request.CommandLine);
@@ -35,12 +37,28 @@ public sealed class CommandModeTests
         Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
     }
 
-    [Fact]
-    public void DetachedLauncherOmitsBreakawayFlagOutsideJob()
+    [Theory]
+    [InlineData(JobBreakawayPolicy.OutsideJob)]
+    [InlineData(JobBreakawayPolicy.SilentBreakaway)]
+    [InlineData(JobBreakawayPolicy.Restricted)]
+    public void DetachedLauncherOmitsExplicitBreakawayWhenNotRequiredOrDenied(JobBreakawayPolicy policy)
     {
-        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", false);
+        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", policy);
 
         Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
         Assert.False(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
+    }
+
+    [Theory]
+    [InlineData(false, 0u, JobBreakawayPolicy.OutsideJob)]
+    [InlineData(true, 0x00000800u, JobBreakawayPolicy.ExplicitBreakawayAllowed)]
+    [InlineData(true, 0x00001000u, JobBreakawayPolicy.SilentBreakaway)]
+    [InlineData(true, 0u, JobBreakawayPolicy.Restricted)]
+    public void DetachedLauncherClassifiesJobBreakawayPolicy(
+        bool isInJob,
+        uint limitFlags,
+        JobBreakawayPolicy expected)
+    {
+        Assert.Equal(expected, DetachedLauncher.ClassifyJobPolicy(isInJob, limitFlags));
     }
 }
