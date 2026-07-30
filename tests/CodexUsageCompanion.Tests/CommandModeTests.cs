@@ -1,5 +1,4 @@
 using CodexUsageCompanion.Lifecycle;
-using System.Diagnostics;
 using Xunit;
 
 namespace CodexUsageCompanion.Tests;
@@ -25,13 +24,23 @@ public sealed class CommandModeTests
     }
 
     [Fact]
-    public void DetachedLauncherCreatesHiddenBackgroundProcess()
+    public void DetachedLauncherCreatesBreakawayBackgroundRequestInsideJob()
     {
-        var startInfo = DetachedLauncher.CreateStartInfo(@"C:\Tools\CodexUsageCompanion.exe");
+        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", true);
 
-        Assert.Equal(@"C:\Tools\CodexUsageCompanion.exe", startInfo.FileName);
-        Assert.Equal("--background", startInfo.Arguments);
-        Assert.True(startInfo.UseShellExecute);
-        Assert.Equal(ProcessWindowStyle.Hidden, startInfo.WindowStyle);
+        Assert.Equal(@"C:\Tools\CodexUsageCompanion.exe", request.ExecutablePath);
+        Assert.Equal("\"C:\\Tools\\CodexUsageCompanion.exe\" --background", request.CommandLine);
+        Assert.Equal(@"C:\Tools", request.WorkingDirectory);
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
+    }
+
+    [Fact]
+    public void DetachedLauncherOmitsBreakawayFlagOutsideJob()
+    {
+        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", false);
+
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
+        Assert.False(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
     }
 }

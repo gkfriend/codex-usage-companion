@@ -179,7 +179,7 @@ public sealed class CompanionRuntime : IAsyncDisposable
         catch (Exception exception)
         {
             CompanionLog.Shared.Write("refresh", exception);
-            if (!_hasUsageState)
+            if (UsageRefreshPolicy.ShouldShowUnavailable(_hasUsageState))
             {
                 await UpdateWindowAsync(null);
             }

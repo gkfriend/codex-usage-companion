@@ -11,6 +11,11 @@ $required = @(
     'plugins/codex-usage-companion/hooks/hooks.json',
     'plugins/codex-usage-companion/bin/win-x64/CodexUsageCompanion.exe',
     'plugins/codex-usage-companion/README.md',
+    'plugins/codex-usage-companion/README.zh-Hant.md',
+    'plugins/codex-usage-companion/README.zh-Hans.md',
+    'plugins/codex-usage-companion/assets/screenshots/overlay-en.png',
+    'plugins/codex-usage-companion/assets/screenshots/overlay-zh-Hant.png',
+    'plugins/codex-usage-companion/assets/screenshots/overlay-zh-Hans.png',
     'plugins/codex-usage-companion/LICENSE',
     'plugins/codex-usage-companion/PRIVACY.md'
 )
