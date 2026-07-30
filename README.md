@@ -13,6 +13,7 @@ Codex Usage Companion is an open-source Windows plugin that keeps Codex rate-lim
 ## Features
 
 - Updates after Codex responses through local rate-limit notifications, with a one-minute recovery refresh.
+- Restarts itself after Codex responses if a network or session reset terminates the resident process, while preserving the last known usage during temporary outages.
 - Keeps one resident companion process and never opens a separate taskbar, Alt+Tab, or tray entry.
 - Follows the Codex window, hides when Codex is minimized, and exits after Codex closes.
 - Shows a five-cell HP bar with green, yellow, orange, red, and empty gray states.
@@ -45,7 +46,7 @@ Run:
 codex plugin marketplace add gkfriend/codex-usage-companion
 ```
 
-Open the Codex Plugins directory, select **Codex Usage Companion**, review and trust the bundled `SessionStart` hook, then install and enable it. Start a new Codex task after installation.
+Open the Codex Plugins directory, select **Codex Usage Companion**, review and trust both bundled Hooks (`SessionStart` and `Stop`), then install and enable it. Start a new Codex task after installation. After every upgrade, open `/hooks` and trust the current definitions again if Codex asks for confirmation.
 
 Alternatively, download the marketplace ZIP from GitHub Releases, extract it, and add the extracted folder with `codex plugin marketplace add <folder>`.
 

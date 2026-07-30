@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
 using CodexUsageCompanion.Configuration;
@@ -37,6 +38,7 @@ public static class Program
 
     private static int HandleRefresh()
     {
+        var startupTimer = Stopwatch.StartNew();
         var coordinator = new InstanceCoordinator();
         if (coordinator.SignalRefresh())
         {
@@ -48,9 +50,9 @@ public static class Program
             return 1;
         }
 
-        for (var attempt = 0; attempt < 20; attempt++)
+        while (startupTimer.Elapsed < ResidentStartupPolicy.SignalWaitTimeout)
         {
-            Thread.Sleep(100);
+            Thread.Sleep(TimeSpan.FromMilliseconds(100));
             if (coordinator.SignalRefresh())
             {
                 return 0;

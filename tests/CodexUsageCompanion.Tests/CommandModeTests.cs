@@ -1,5 +1,4 @@
 using CodexUsageCompanion.Lifecycle;
-using System.Diagnostics;
 using Xunit;
 
 namespace CodexUsageCompanion.Tests;
@@ -25,13 +24,68 @@ public sealed class CommandModeTests
     }
 
     [Fact]
-    public void DetachedLauncherCreatesHiddenBackgroundProcess()
+    public void DetachedLauncherCreatesBreakawayBackgroundRequestWhenAllowed()
     {
-        var startInfo = DetachedLauncher.CreateStartInfo(@"C:\Tools\CodexUsageCompanion.exe");
+        var request = DetachedLauncher.CreateRequest(
+            @"C:\Tools\CodexUsageCompanion.exe",
+            JobBreakawayPolicy.ExplicitBreakawayAllowed);
 
-        Assert.Equal(@"C:\Tools\CodexUsageCompanion.exe", startInfo.FileName);
-        Assert.Equal("--background", startInfo.Arguments);
-        Assert.True(startInfo.UseShellExecute);
-        Assert.Equal(ProcessWindowStyle.Hidden, startInfo.WindowStyle);
+        Assert.Equal(@"C:\Tools\CodexUsageCompanion.exe", request.ExecutablePath);
+        Assert.Equal("\"C:\\Tools\\CodexUsageCompanion.exe\" --background", request.CommandLine);
+        Assert.Equal(@"C:\Tools", request.WorkingDirectory);
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
+        Assert.Equal(4u, (uint)request.CreationFlags & 4u);
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
+    }
+
+    [Theory]
+    [InlineData(JobBreakawayPolicy.OutsideJob)]
+    [InlineData(JobBreakawayPolicy.SilentBreakaway)]
+    [InlineData(JobBreakawayPolicy.Restricted)]
+    public void DetachedLauncherOmitsExplicitBreakawayWhenNotRequiredOrDenied(JobBreakawayPolicy policy)
+    {
+        var request = DetachedLauncher.CreateRequest(@"C:\Tools\CodexUsageCompanion.exe", policy);
+
+        Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
+        Assert.False(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
+    }
+
+    [Theory]
+    [InlineData(false, 0u, JobBreakawayPolicy.OutsideJob)]
+    [InlineData(true, 0x00000800u, JobBreakawayPolicy.ExplicitBreakawayAllowed)]
+    [InlineData(true, 0x00001000u, JobBreakawayPolicy.SilentBreakaway)]
+    [InlineData(true, 0u, JobBreakawayPolicy.Restricted)]
+    public void DetachedLauncherClassifiesJobBreakawayPolicy(
+        bool isInJob,
+        uint limitFlags,
+        JobBreakawayPolicy expected)
+    {
+        Assert.Equal(expected, DetachedLauncher.ClassifyJobPolicy(isInJob, limitFlags));
+    }
+
+    [Theory]
+    [InlineData(JobBreakawayPolicy.OutsideJob, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.ExplicitBreakawayAllowed, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.SilentBreakaway, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.Restricted, DetachedLaunchStrategy.SystemBroker)]
+    public void DetachedLauncherSelectsBrokerOnlyWhenJobBreakawayIsRestricted(
+        JobBreakawayPolicy policy,
+        DetachedLaunchStrategy expected)
+    {
+        Assert.Equal(expected, DetachedLauncher.SelectLaunchStrategy(policy));
+    }
+
+    [Fact]
+    public void SystemBrokerUsesHiddenCimProcessCreation()
+    {
+        var startInfo = DetachedLauncher.CreateBrokerStartInfo(@"C:\Tools\CodexUsageCompanion.exe");
+
+        Assert.EndsWith(@"\WindowsPowerShell\v1.0\powershell.exe", startInfo.FileName);
+        Assert.True(startInfo.CreateNoWindow);
+        Assert.False(startInfo.UseShellExecute);
+        Assert.True(startInfo.RedirectStandardOutput);
+        Assert.True(startInfo.RedirectStandardError);
+        Assert.Contains("Invoke-CimMethod", startInfo.ArgumentList[^1]);
+        Assert.Contains(@"C:\Tools\CodexUsageCompanion.exe", startInfo.ArgumentList[^1]);
     }
 }

@@ -13,6 +13,7 @@ Codex Usage Companion 是开源 Windows 插件，会在 Codex Desktop 右下角�
 ## 功能
 
 - Codex 回复后通过本地通知更新，并每分钟进行一次备用更新。
+- 如果网络或会话重置导致常驻进程终止，会在 Codex 回复后自动重新启动；暂时断线期间保留最后已知用量。
 - 始终只保留一个常驻进程，不会出现在任务栏、Alt+Tab 或系统托盘。
 - 面板会跟随 Codex 窗口；Codex 最小化时隐藏，Codex 关闭后自动退出。
 - 使用五格 HP Bar，以绿、黄、橙、红、灰色快速表示剩余比例。
@@ -45,7 +46,7 @@ Release 已包含所需运行环境，无需另外安装 .NET Runtime。
 codex plugin marketplace add gkfriend/codex-usage-companion
 ```
 
-打开 Codex 插件目录，选择 **Codex Usage Companion**，检查并信任内置的 `SessionStart` Hook，然后安装并启用。安装后请打开新的 Codex 对话。
+打开 Codex 插件目录，选择 **Codex Usage Companion**，检查并信任内置的两个 Hook（`SessionStart` 和 `Stop`），然后安装并启用。安装后请打开新的 Codex 对话。每次更新后，如果 Codex 再次要求确认，请打开 `/hooks` 并重新信任当前的 Hook 定义。
 
 也可以从 GitHub Releases 下载 Marketplace ZIP，解压后运行 `codex plugin marketplace add <文件夹>`。
 

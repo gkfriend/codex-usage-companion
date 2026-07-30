@@ -11,6 +11,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${PLUGIN_ROOT}/bin/win-x64/CodexUsageCompanion.exe\" --refresh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

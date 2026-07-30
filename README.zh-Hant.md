@@ -13,6 +13,7 @@ Codex Usage Companion 是開放原始碼 Windows 外掛，會在 Codex Desktop �
 ## 功能
 
 - Codex 回覆後透過本機通知更新，並每分鐘進行一次備援更新。
+- 若網路或工作階段重置導致常駐程序終止，會在 Codex 回覆後自動重新啟動；暫時斷線期間保留最後已知用量。
 - 永遠只保留一個常駐程序，不會出現在工作列、Alt+Tab 或系統匣。
 - 面板會跟隨 Codex 視窗；Codex 最小化時隱藏，Codex 關閉後自動結束。
 - 使用五格 HP Bar，以綠、黃、橘、紅、灰色快速表示剩餘比例。
@@ -45,7 +46,7 @@ Release 已包含所需執行環境，不必另外安裝 .NET Runtime。
 codex plugin marketplace add gkfriend/codex-usage-companion
 ```
 
-開啟 Codex 外掛目錄，選擇 **Codex Usage Companion**，檢視並信任內含的 `SessionStart` Hook，然後安裝並啟用。安裝後請開啟新的 Codex 對話。
+開啟 Codex 外掛目錄，選擇 **Codex Usage Companion**，檢視並信任內含的兩個 Hook（`SessionStart` 與 `Stop`），然後安裝並啟用。安裝後請開啟新的 Codex 對話。每次更新後，若 Codex 再次要求確認，請開啟 `/hooks` 並重新信任目前的 Hook 定義。
 
 也可以從 GitHub Releases 下載 Marketplace ZIP，解壓縮後執行 `codex plugin marketplace add <資料夾>`。
 

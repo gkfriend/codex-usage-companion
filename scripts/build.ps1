@@ -23,7 +23,7 @@ if (Test-Path -LiteralPath $artifacts) {
     Remove-Item -LiteralPath $artifacts -Recurse -Force
 }
 
-New-Item -ItemType Directory -Force -Path $publish,(Join-Path $marketplace '.agents\plugins'),(Join-Path $plugin '.codex-plugin'),(Join-Path $plugin 'hooks'),(Join-Path $plugin 'bin\win-x64') | Out-Null
+New-Item -ItemType Directory -Force -Path $publish,(Join-Path $marketplace '.agents\plugins'),(Join-Path $plugin '.codex-plugin'),(Join-Path $plugin 'hooks'),(Join-Path $plugin 'bin\win-x64'),(Join-Path $plugin 'assets\screenshots') | Out-Null
 
 dotnet restore $solution
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -46,6 +46,7 @@ Copy-Item -LiteralPath (Join-Path $root 'README.zh-Hant.md') -Destination (Join-
 Copy-Item -LiteralPath (Join-Path $root 'README.zh-Hans.md') -Destination (Join-Path $plugin 'README.zh-Hans.md') -Force
 Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Join-Path $plugin 'LICENSE') -Force
 Copy-Item -LiteralPath (Join-Path $root 'PRIVACY.md') -Destination (Join-Path $plugin 'PRIVACY.md') -Force
+Copy-Item -Path (Join-Path $root 'assets\screenshots\*') -Destination (Join-Path $plugin 'assets\screenshots') -Force
 Copy-Item -LiteralPath (Join-Path $publish 'CodexUsageCompanion.exe') -Destination (Join-Path $plugin 'bin\win-x64\CodexUsageCompanion.exe') -Force
 
 Compress-Archive -Path (Join-Path $marketplace '*') -DestinationPath $archive -CompressionLevel Optimal -Force
