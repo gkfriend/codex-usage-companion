@@ -34,6 +34,7 @@ public sealed class CommandModeTests
         Assert.Equal("\"C:\\Tools\\CodexUsageCompanion.exe\" --background", request.CommandLine);
         Assert.Equal(@"C:\Tools", request.WorkingDirectory);
         Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateNoWindow));
+        Assert.Equal(4u, (uint)request.CreationFlags & 4u);
         Assert.True(request.CreationFlags.HasFlag(DetachedProcessCreationFlags.CreateBreakawayFromJob));
     }
 
@@ -60,5 +61,31 @@ public sealed class CommandModeTests
         JobBreakawayPolicy expected)
     {
         Assert.Equal(expected, DetachedLauncher.ClassifyJobPolicy(isInJob, limitFlags));
+    }
+
+    [Theory]
+    [InlineData(JobBreakawayPolicy.OutsideJob, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.ExplicitBreakawayAllowed, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.SilentBreakaway, DetachedLaunchStrategy.Direct)]
+    [InlineData(JobBreakawayPolicy.Restricted, DetachedLaunchStrategy.SystemBroker)]
+    public void DetachedLauncherSelectsBrokerOnlyWhenJobBreakawayIsRestricted(
+        JobBreakawayPolicy policy,
+        DetachedLaunchStrategy expected)
+    {
+        Assert.Equal(expected, DetachedLauncher.SelectLaunchStrategy(policy));
+    }
+
+    [Fact]
+    public void SystemBrokerUsesHiddenCimProcessCreation()
+    {
+        var startInfo = DetachedLauncher.CreateBrokerStartInfo(@"C:\Tools\CodexUsageCompanion.exe");
+
+        Assert.EndsWith(@"\WindowsPowerShell\v1.0\powershell.exe", startInfo.FileName);
+        Assert.True(startInfo.CreateNoWindow);
+        Assert.False(startInfo.UseShellExecute);
+        Assert.True(startInfo.RedirectStandardOutput);
+        Assert.True(startInfo.RedirectStandardError);
+        Assert.Contains("Invoke-CimMethod", startInfo.ArgumentList[^1]);
+        Assert.Contains(@"C:\Tools\CodexUsageCompanion.exe", startInfo.ArgumentList[^1]);
     }
 }
