@@ -1,6 +1,6 @@
 {
   "name": "codex-usage-companion",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Automatically displays Codex rate-limit usage beside Codex Desktop.",
   "author": {
     "name": "gkfriend",

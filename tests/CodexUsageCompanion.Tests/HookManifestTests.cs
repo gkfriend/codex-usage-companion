@@ -6,22 +6,28 @@ namespace CodexUsageCompanion.Tests;
 public sealed class HookManifestTests
 {
     [Fact]
-    public void StopHookRefreshesOrRestartsResidentAfterResponses()
+    public void ManifestRecoversOnSessionAndPromptThenRefreshesAfterResponse()
     {
         var path = Path.Combine(AppContext.BaseDirectory, "hooks.json");
         using var document = JsonDocument.Parse(File.ReadAllText(path));
-        var stop = document.RootElement
-            .GetProperty("hooks")
-            .GetProperty("Stop");
+        var hooks = document.RootElement.GetProperty("hooks");
 
-        var hook = Assert.Single(stop.EnumerateArray())
-            .GetProperty("hooks");
-        var command = Assert.Single(hook.EnumerateArray());
+        AssertCommand(hooks, "SessionStart", "--session-start");
+        AssertCommand(hooks, "UserPromptSubmit", "--session-start");
+        AssertCommand(hooks, "Stop", "--refresh");
+    }
 
-        Assert.Equal("command", command.GetProperty("type").GetString());
-        Assert.Equal(
-            "\"${PLUGIN_ROOT}/bin/win-x64/CodexUsageCompanion.exe\" --refresh",
-            command.GetProperty("command").GetString());
-        Assert.Equal(10, command.GetProperty("timeout").GetInt32());
+    private static void AssertCommand(JsonElement hooks, string eventName, string argument)
+    {
+        var groups = hooks.GetProperty(eventName);
+        Assert.Equal(1, groups.GetArrayLength());
+        var handlers = groups[0].GetProperty("hooks");
+        Assert.Equal(1, handlers.GetArrayLength());
+        var handler = handlers[0];
+        Assert.Equal("command", handler.GetProperty("type").GetString());
+        var command = handler.GetProperty("command").GetString();
+        Assert.Contains("${PLUGIN_ROOT}/bin/win-x64/CodexUsageCompanion.exe", command);
+        Assert.EndsWith(argument, command);
+        Assert.Equal(10, handler.GetProperty("timeout").GetInt32());
     }
 }
