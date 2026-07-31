@@ -58,12 +58,11 @@ Expected: PASS.
 
 **Files:**
 - Modify: `.codex-plugin/plugin.json`
-- Modify: `marketplace.json`
 - Modify: `src/CodexUsageCompanion/CodexUsageCompanion.csproj`
+- Modify: `tests/CodexUsageCompanion.Tests/CodexAppServerSessionTests.cs`
 - Modify: `README.md`
 - Modify: `README.zh-Hant.md`
 - Modify: `README.zh-Hans.md`
-- Modify: `CHANGELOG.md`
 
 **Step 1: Bump the version**
 
