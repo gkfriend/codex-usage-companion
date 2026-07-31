@@ -6,6 +6,7 @@ public enum CommandMode
     SessionStart,
     Refresh,
     Background,
+    Recovery,
     Probe,
     RenderPreview
 }
@@ -24,6 +25,7 @@ public static class CommandModeParser
             "--session-start" => CommandMode.SessionStart,
             "--refresh" => CommandMode.Refresh,
             "--background" => CommandMode.Background,
+            "--recover" => CommandMode.Recovery,
             "--probe" => CommandMode.Probe,
             "--render-preview" => CommandMode.RenderPreview,
             _ => CommandMode.Unknown

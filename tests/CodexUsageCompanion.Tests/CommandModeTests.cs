@@ -9,6 +9,7 @@ public sealed class CommandModeTests
     [InlineData("--session-start", CommandMode.SessionStart)]
     [InlineData("--refresh", CommandMode.Refresh)]
     [InlineData("--background", CommandMode.Background)]
+    [InlineData("--recover", CommandMode.Recovery)]
     [InlineData("--probe", CommandMode.Probe)]
     [InlineData("--render-preview", CommandMode.RenderPreview)]
     public void ParseRecognizesSupportedMode(string argument, CommandMode expected)

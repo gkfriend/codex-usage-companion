@@ -2,10 +2,12 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
 using CodexUsageCompanion.Configuration;
+using CodexUsageCompanion.Diagnostics;
 using CodexUsageCompanion.Lifecycle;
 using CodexUsageCompanion.Localization;
 using CodexUsageCompanion.RateLimits;
 using CodexUsageCompanion.Ui;
+using CodexUsageCompanion.Windows;
 
 namespace CodexUsageCompanion;
 
@@ -19,6 +21,7 @@ public static class Program
             CommandMode.SessionStart => HandleSessionStart(),
             CommandMode.Refresh => HandleRefresh(),
             CommandMode.Background => RunBackground(),
+            CommandMode.Recovery => HandleRecovery(),
             CommandMode.Probe => RunProbe(),
             CommandMode.RenderPreview => RunRenderPreview(args),
             _ => RunBackground()
@@ -82,6 +85,23 @@ public static class Program
         var exitCode = application.Run();
         runtime.DisposeAsync().AsTask().GetAwaiter().GetResult();
         return exitCode;
+    }
+
+    private static int HandleRecovery()
+    {
+        if (!new CodexWindowLocator().IsCodexRunning())
+        {
+            return 0;
+        }
+
+        var coordinator = new InstanceCoordinator();
+        if (coordinator.SignalRefresh())
+        {
+            return 0;
+        }
+
+        CompanionLog.Shared.Write("recovery", "scheduled-launch");
+        return DetachedLauncher.Start() ? 0 : 1;
     }
 
     private static int RunProbe()
