@@ -1,5 +1,7 @@
 # Codex Usage Companion
 
+![Codex Usage Companion in Codex Work mode](assets/screenshots/codex-work-widget.png)
+
 [繁體中文](README.zh-Hant.md) · [简体中文](README.zh-Hans.md)
 
 Codex Usage Companion is an open-source Windows plugin that keeps Codex rate-limit usage visible in a compact panel attached to Codex Desktop.
