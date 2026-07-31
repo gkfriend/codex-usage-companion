@@ -54,7 +54,7 @@ public sealed class CodexAppServerSessionTests
         Assert.Equal(58, state.Weekly?.RemainingPercent);
         var output = writer.ToString();
         Assert.Contains("\"method\":\"initialize\"", output);
-        Assert.Contains("\"version\":\"0.3.3\"", output);
+        Assert.Contains("\"version\":\"0.3.4\"", output);
         Assert.Contains("\"method\":\"initialized\"", output);
         Assert.Contains("\"method\":\"account/rateLimits/read\"", output);
     }
