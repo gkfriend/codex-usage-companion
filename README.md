@@ -12,8 +12,9 @@ Codex Usage Companion is an open-source Windows plugin that keeps Codex rate-lim
 
 ## Features
 
-- Updates when a prompt is submitted and after Codex responses, with live local notifications and a one-minute recovery refresh.
-- Restarts itself on the first submitted prompt or completed response if a Codex update, network reset, or session reset terminates the resident process, while preserving the last known usage during temporary outages.
+- Updates when a prompt is submitted and after Codex responses, with live local notifications and a one-minute fallback refresh.
+- Starting with v0.3.4, an independent Windows scheduled check restores the companion within one minute after Codex restarts or the resident exits, even when Codex Hooks do not run.
+- Uses no permanent watcher while Codex is closed; the scheduled check exits immediately after each run.
 - Keeps one resident companion process and never opens a separate taskbar, Alt+Tab, or tray entry.
 - Follows the Codex window, hides when Codex is minimized, and exits after Codex closes.
 - Shows a five-cell HP bar with green, yellow, orange, red, and empty gray states.
@@ -49,6 +50,22 @@ codex plugin marketplace add gkfriend/codex-usage-companion
 Open the Codex Plugins directory, select **Codex Usage Companion**, review and trust the three bundled Hooks (`SessionStart`, `UserPromptSubmit`, and `Stop`), then install and enable it. Start a new Codex task after installation. After every upgrade, open `/hooks` and trust the current definitions again if Codex asks for confirmation.
 
 Alternatively, download the marketplace ZIP from GitHub Releases, extract it, and add the extracted folder with `codex plugin marketplace add <folder>`.
+
+## Automatic recovery
+
+From the installed Codex Usage Companion plugin directory, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-recovery.ps1
+```
+
+This creates the per-user hidden task `\CodexUsageCompanion\Recovery`, starts it immediately, and checks once per minute. It requires no administrator permission and leaves no permanent PowerShell process. Existing Hooks remain enabled for immediate startup and refresh.
+
+To remove only automatic recovery while keeping the plugin, settings, and logs:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\uninstall-recovery.ps1
+```
 
 ## Settings
 
