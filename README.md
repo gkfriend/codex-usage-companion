@@ -12,8 +12,8 @@ Codex Usage Companion is an open-source Windows plugin that keeps Codex rate-lim
 
 ## Features
 
-- Updates when a prompt is submitted and after Codex responses, with live local notifications and a one-minute fallback refresh.
-- Starting with v0.3.4, an independent Windows scheduled check restores the companion within one minute after Codex restarts or the resident exits, even when Codex Hooks do not run.
+- Updates when a prompt is submitted and after Codex responses, with live local notifications and a three-minute fallback refresh.
+- Starting with v0.3.5, an independent windowless Windows scheduled check restores the companion within about three minutes after Codex restarts or the resident exits, even when Codex Hooks do not run.
 - Uses no permanent watcher while Codex is closed; the scheduled check exits immediately after each run.
 - Keeps one resident companion process and never opens a separate taskbar, Alt+Tab, or tray entry.
 - Follows the Codex window, hides when Codex is minimized, and exits after Codex closes.
@@ -59,7 +59,7 @@ From the installed Codex Usage Companion plugin directory, run:
 powershell -ExecutionPolicy Bypass -File .\scripts\install-recovery.ps1
 ```
 
-This creates the per-user hidden task `\CodexUsageCompanion\Recovery`, starts it immediately, and checks once per minute. It requires no administrator permission and leaves no permanent PowerShell process. Existing Hooks remain enabled for immediate startup and refresh.
+This creates the per-user hidden task `\CodexUsageCompanion\Recovery`, starts it immediately, and checks every three minutes through a consoleless Windows Script Host launcher. It requires no administrator permission and leaves no permanent PowerShell process. Existing Hooks remain enabled for immediate startup and refresh.
 
 To remove only automatic recovery while keeping the plugin, settings, and logs:
 

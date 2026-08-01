@@ -11,10 +11,16 @@ $taskName = 'Recovery'
 $recoveryRoot = Join-Path $LocalAppDataPath 'CodexUsageCompanion\Recovery'
 $launcherSource = Join-Path $PSScriptRoot 'recovery-launcher.ps1'
 $launcherDestination = Join-Path $recoveryRoot 'recovery-launcher.ps1'
+$wrapperSource = Join-Path $PSScriptRoot 'recovery-launcher.vbs'
+$wrapperDestination = Join-Path $recoveryRoot 'recovery-launcher.vbs'
 $configurationPath = Join-Path $recoveryRoot 'recovery.json'
 
 if (-not (Test-Path -LiteralPath $launcherSource)) {
     throw "Recovery launcher is missing: $launcherSource"
+}
+
+if (-not (Test-Path -LiteralPath $wrapperSource)) {
+    throw "Recovery wrapper is missing: $wrapperSource"
 }
 
 if ([string]::IsNullOrWhiteSpace($PreferredExecutable)) {
@@ -34,16 +40,17 @@ if ([string]::IsNullOrWhiteSpace($PreferredExecutable) -or -not (Test-Path -Lite
 
 New-Item -ItemType Directory -Force -Path $recoveryRoot | Out-Null
 Copy-Item -LiteralPath $launcherSource -Destination $launcherDestination -Force
+Copy-Item -LiteralPath $wrapperSource -Destination $wrapperDestination -Force
 [pscustomobject]@{
     preferredExecutable = [System.IO.Path]::GetFullPath($PreferredExecutable)
     userProfilePath = [System.IO.Path]::GetFullPath($UserProfilePath)
 } | ConvertTo-Json | Set-Content -LiteralPath $configurationPath -Encoding utf8
 
 if (-not $SkipTaskRegistration) {
-    $powerShell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-    $arguments = "-NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$launcherDestination`""
-    $action = New-ScheduledTaskAction -Execute $powerShell -Argument $arguments
-    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 1)
+    $windowsScriptHost = Join-Path $env:SystemRoot 'System32\wscript.exe'
+    $arguments = "//B //NoLogo `"$wrapperDestination`""
+    $action = New-ScheduledTaskAction -Execute $windowsScriptHost -Argument $arguments
+    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(3) -RepetitionInterval (New-TimeSpan -Minutes 3)
     $trigger.Repetition.StopAtDurationEnd = $false
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -Hidden -ExecutionTimeLimit (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew
     $userId = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
