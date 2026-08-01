@@ -49,6 +49,7 @@ Copy-Item -LiteralPath (Join-Path $root 'PRIVACY.md') -Destination (Join-Path $p
 Copy-Item -Path (Join-Path $root 'assets\screenshots\*') -Destination (Join-Path $plugin 'assets\screenshots') -Force
 Copy-Item -LiteralPath (Join-Path $publish 'CodexUsageCompanion.exe') -Destination (Join-Path $plugin 'bin\win-x64\CodexUsageCompanion.exe') -Force
 Copy-Item -LiteralPath (Join-Path $root 'scripts\recovery-launcher.ps1') -Destination (Join-Path $plugin 'scripts\recovery-launcher.ps1') -Force
+Copy-Item -LiteralPath (Join-Path $root 'scripts\recovery-launcher.vbs') -Destination (Join-Path $plugin 'scripts\recovery-launcher.vbs') -Force
 Copy-Item -LiteralPath (Join-Path $root 'scripts\install-recovery.ps1') -Destination (Join-Path $plugin 'scripts\install-recovery.ps1') -Force
 Copy-Item -LiteralPath (Join-Path $root 'scripts\uninstall-recovery.ps1') -Destination (Join-Path $plugin 'scripts\uninstall-recovery.ps1') -Force
 

@@ -11,6 +11,7 @@ $required = @(
     'plugins/codex-usage-companion/hooks/hooks.json',
     'plugins/codex-usage-companion/bin/win-x64/CodexUsageCompanion.exe',
     'plugins/codex-usage-companion/scripts/recovery-launcher.ps1',
+    'plugins/codex-usage-companion/scripts/recovery-launcher.vbs',
     'plugins/codex-usage-companion/scripts/install-recovery.ps1',
     'plugins/codex-usage-companion/scripts/uninstall-recovery.ps1',
     'plugins/codex-usage-companion/README.md',

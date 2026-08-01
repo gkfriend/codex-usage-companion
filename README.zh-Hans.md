@@ -12,8 +12,8 @@ Codex Usage Companion 是开源 Windows 插件，会在 Codex Desktop 右下角�
 
 ## 功能
 
-- 发送消息时和 Codex 回复后都会更新，并通过本地通知与每分钟备用更新保持数据同步。
-- 从 v0.3.4 开始，独立的 Windows 计划任务会在 Codex 重新启动或常驻进程退出后一分钟内恢复插件，即使 Codex Hook 没有运行也能恢复。
+- 发送消息时和 Codex 回复后都会更新，并通过本地通知与每三分钟备用更新保持数据同步。
+- 从 v0.3.5 开始，独立且不显示窗口的 Windows 计划任务会在 Codex 重新启动或常驻进程退出后约三分钟内恢复插件，即使 Codex Hook 没有运行也能恢复。
 - Codex 关闭时不会保留额外监控进程；每次计划检查完成后立即退出。
 - 始终只保留一个常驻进程，不会出现在任务栏、Alt+Tab 或系统托盘。
 - 面板会跟随 Codex 窗口；Codex 最小化时隐藏，Codex 关闭后自动退出。
@@ -59,7 +59,7 @@ codex plugin marketplace add gkfriend/codex-usage-companion
 powershell -ExecutionPolicy Bypass -File .\scripts\install-recovery.ps1
 ```
 
-这会创建当前用户专用的隐藏计划任务 `\CodexUsageCompanion\Recovery`、立即启动，并每分钟检查一次。无需管理员权限，也不会留下常驻 PowerShell 进程；原有 Hook 仍负责即时启动和更新。
+这会创建当前用户专用的隐藏计划任务 `\CodexUsageCompanion\Recovery`、立即启动，并通过不显示控制台的 Windows Script Host 启动器每三分钟检查一次。无需管理员权限，也不会留下常驻 PowerShell 进程；原有 Hook 仍负责即时启动和更新。
 
 如果只想移除自动恢复，但保留插件、设置和日志：
 
