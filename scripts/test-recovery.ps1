@@ -65,6 +65,9 @@ try {
         if ($task.Actions.Arguments -notlike '*recovery-launcher.vbs*') {
             throw 'Scheduled task does not invoke the recovery wrapper.'
         }
+        if ($task.Actions.Arguments -notlike '*//B*') {
+            throw 'Scheduled task does not suppress Windows Script Host dialogs.'
+        }
         if ($task.Triggers.Repetition.Interval -ne 'PT3M') {
             throw "Scheduled task interval must be PT3M but is '$($task.Triggers.Repetition.Interval)'."
         }

@@ -48,7 +48,7 @@ Copy-Item -LiteralPath $wrapperSource -Destination $wrapperDestination -Force
 
 if (-not $SkipTaskRegistration) {
     $windowsScriptHost = Join-Path $env:SystemRoot 'System32\wscript.exe'
-    $arguments = "`"$wrapperDestination`""
+    $arguments = "//B //NoLogo `"$wrapperDestination`""
     $action = New-ScheduledTaskAction -Execute $windowsScriptHost -Argument $arguments
     $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(3) -RepetitionInterval (New-TimeSpan -Minutes 3)
     $trigger.Repetition.StopAtDurationEnd = $false
