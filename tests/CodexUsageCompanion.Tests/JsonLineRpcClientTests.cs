@@ -7,6 +7,23 @@ namespace CodexUsageCompanion.Tests;
 public sealed class JsonLineRpcClientTests
 {
     [Fact]
+    public async Task ConnectionPreservesRawNotificationPayload()
+    {
+        const string notification = "{\"method\":\"account/rateLimits/updated\",\"params\":{\"rateLimits\":{\"primary\":{\"usedPercent\":20}}}}";
+        using var reader = new StringReader($"{notification}{Environment.NewLine}{{\"id\":1,\"result\":{{}}}}");
+        using var writer = new StringWriter();
+        await using var connection = new JsonLineRpcConnection(reader, writer);
+        var received = new TaskCompletionSource<(string Method, string Json)>(TaskCreationOptions.RunContinuationsAsynchronously);
+        connection.NotificationReceived += (method, json) => received.SetResult((method, json));
+
+        await connection.SendRequestAsync(1, "{}", CancellationToken.None);
+        var value = await received.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.Equal("account/rateLimits/updated", value.Method);
+        Assert.Equal(notification, value.Json);
+    }
+
+    [Fact]
     public async Task ConnectionThrowsMeaningfulErrorForJsonRpcFailure()
     {
         using var reader = new StringReader("{\"id\":1,\"error\":{\"code\":-32600,\"message\":\"invalid request\"}}");

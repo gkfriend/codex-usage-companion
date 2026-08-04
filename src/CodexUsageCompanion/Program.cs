@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Windows;
 using CodexUsageCompanion.Configuration;
@@ -30,39 +29,23 @@ public static class Program
 
     private static int HandleSessionStart()
     {
-        var coordinator = new InstanceCoordinator();
-        if (coordinator.SignalRefresh())
-        {
-            return 0;
-        }
-
-        return DetachedLauncher.Start() ? 0 : 1;
+        return CreateHookCommandRunner().Run(true);
     }
 
     private static int HandleRefresh()
     {
-        var startupTimer = Stopwatch.StartNew();
+        return CreateHookCommandRunner().Run(false);
+    }
+
+    private static HookCommandRunner CreateHookCommandRunner()
+    {
+        var locator = new CodexWindowLocator();
         var coordinator = new InstanceCoordinator();
-        if (coordinator.SignalRefresh())
-        {
-            return 0;
-        }
-
-        if (!DetachedLauncher.Start())
-        {
-            return 1;
-        }
-
-        while (startupTimer.Elapsed < ResidentStartupPolicy.SignalWaitTimeout)
-        {
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            if (coordinator.SignalRefresh())
-            {
-                return 0;
-            }
-        }
-
-        return 1;
+        return new HookCommandRunner(
+            locator.IsCodexRunning,
+            coordinator.SignalRefresh,
+            DetachedLauncher.Start,
+            Console.Out);
     }
 
     private static int RunBackground()

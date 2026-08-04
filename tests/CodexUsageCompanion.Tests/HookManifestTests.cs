@@ -28,6 +28,6 @@ public sealed class HookManifestTests
         var command = handler.GetProperty("command").GetString();
         Assert.Contains("${PLUGIN_ROOT}/bin/win-x64/CodexUsageCompanion.exe", command);
         Assert.EndsWith(argument, command);
-        Assert.Equal(10, handler.GetProperty("timeout").GetInt32());
+        Assert.Equal(5, handler.GetProperty("timeout").GetInt32());
     }
 }

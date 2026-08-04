@@ -29,14 +29,14 @@ public sealed class CompanionRuntime : IAsyncDisposable
     {
         _lease = lease;
         _window = new UsageOverlayWindow(settings, text);
-        _refreshCoordinator = new RefreshCoordinator(RefreshUsageAsync);
+        _refreshCoordinator = new RefreshCoordinator(RefreshUsageAsync, RefreshPolicy.MinimumInterval);
         _windowTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromSeconds(1)
         };
         _fallbackRefreshTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
-            Interval = TimeSpan.FromMinutes(1)
+            Interval = RefreshPolicy.MinimumInterval
         };
         _windowTimer.Tick += HandleWindowTimer;
         _fallbackRefreshTimer.Tick += HandleFallbackRefresh;
@@ -139,12 +139,21 @@ public sealed class CompanionRuntime : IAsyncDisposable
         _refreshCoordinator.Request();
     }
 
-    private void HandleRateLimitsChanged()
+    private void HandleRateLimitsChanged(RateLimitState state)
     {
-        var application = _application;
-        if (application is not null)
+        _ = ApplyRateLimitsChangedAsync(state);
+    }
+
+    private async Task ApplyRateLimitsChangedAsync(RateLimitState state)
+    {
+        try
         {
-            _refreshCoordinator.Request();
+            await UpdateWindowAsync(state);
+            _hasUsageState = true;
+        }
+        catch (Exception exception)
+        {
+            CompanionLog.Shared.Write("rate-limit-notification", exception);
         }
     }
 

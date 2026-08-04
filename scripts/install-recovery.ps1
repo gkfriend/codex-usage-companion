@@ -50,7 +50,7 @@ if (-not $SkipTaskRegistration) {
     $windowsScriptHost = Join-Path $env:SystemRoot 'System32\wscript.exe'
     $arguments = "//B //NoLogo `"$wrapperDestination`""
     $action = New-ScheduledTaskAction -Execute $windowsScriptHost -Argument $arguments
-    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(3) -RepetitionInterval (New-TimeSpan -Minutes 3)
+    $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(5) -RepetitionInterval (New-TimeSpan -Minutes 5)
     $trigger.Repetition.StopAtDurationEnd = $false
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -Hidden -ExecutionTimeLimit (New-TimeSpan -Minutes 1) -MultipleInstances IgnoreNew
     $userId = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name

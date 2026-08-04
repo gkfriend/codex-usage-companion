@@ -6,6 +6,45 @@ namespace CodexUsageCompanion.Tests;
 public sealed class RefreshCoordinatorTests
 {
     [Fact]
+    public async Task RequestsAreLimitedToOneAcceptedReadEveryFiveMinutes()
+    {
+        var now = new DateTimeOffset(2026, 8, 4, 0, 0, 0, TimeSpan.Zero);
+        var firstCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var calls = 0;
+        await using var coordinator = new RefreshCoordinator(
+            _ =>
+            {
+                var call = Interlocked.Increment(ref calls);
+                if (call == 1)
+                {
+                    firstCompleted.SetResult();
+                }
+                else if (call == 2)
+                {
+                    secondCompleted.SetResult();
+                }
+
+                return Task.CompletedTask;
+            },
+            RefreshPolicy.MinimumInterval,
+            () => now);
+
+        coordinator.Request();
+        await firstCompleted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+        coordinator.Request();
+        await Task.Delay(100);
+
+        Assert.Equal(1, calls);
+
+        now = now.AddMinutes(5);
+        coordinator.Request();
+        await secondCompleted.Task.WaitAsync(TimeSpan.FromSeconds(2));
+
+        Assert.Equal(2, calls);
+    }
+
+    [Fact]
     public async Task RequestsDuringRefreshAreCoalescedIntoOneFollowUp()
     {
         var firstStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
