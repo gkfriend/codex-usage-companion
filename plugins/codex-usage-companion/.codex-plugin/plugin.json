@@ -1,0 +1,23 @@
+{
+  "name": "codex-usage-companion",
+  "version": "0.3.6",
+  "description": "Automatically displays Codex rate-limit usage beside Codex Desktop.",
+  "author": {
+    "name": "gkfriend",
+    "url": "https://github.com/gkfriend/codex-usage-companion"
+  },
+  "interface": {
+    "displayName": "Codex Usage Companion",
+    "shortDescription": "Always-visible Codex usage without opening the usage dialog.",
+    "longDescription": "Shows the weekly Codex limit in a lower-right companion panel that follows Codex Desktop and refreshes from live account updates.",
+    "developerName": "gkfriend",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "brandColor": "#10A37F",
+    "defaultPrompt": [
+      "Show my current Codex usage."
+    ]
+  }
+}
