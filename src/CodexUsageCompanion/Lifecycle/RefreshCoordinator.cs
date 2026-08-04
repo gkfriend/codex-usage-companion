@@ -6,20 +6,41 @@ public sealed class RefreshCoordinator : IAsyncDisposable
     private readonly SemaphoreSlim _signal = new(0, 1);
     private readonly CancellationTokenSource _cancellation = new();
     private readonly Task _worker;
+    private readonly TimeSpan _minimumInterval;
+    private readonly Func<DateTimeOffset> _utcNow;
+    private readonly object _requestSync = new();
+    private DateTimeOffset? _lastAcceptedAt;
     private int _pending;
     private int _disposed;
 
-    public RefreshCoordinator(Func<CancellationToken, Task> refresh)
+    public RefreshCoordinator(
+        Func<CancellationToken, Task> refresh,
+        TimeSpan? minimumInterval = null,
+        Func<DateTimeOffset>? utcNow = null)
     {
         _refresh = refresh;
+        _minimumInterval = minimumInterval ?? TimeSpan.Zero;
+        _utcNow = utcNow ?? (() => DateTimeOffset.UtcNow);
         _worker = Task.Run(RunAsync);
     }
 
     public void Request()
     {
-        if (Volatile.Read(ref _disposed) != 0 || Interlocked.Exchange(ref _pending, 1) != 0)
+        lock (_requestSync)
         {
-            return;
+            if (Volatile.Read(ref _disposed) != 0 || _pending != 0)
+            {
+                return;
+            }
+
+            var now = _utcNow();
+            if (_lastAcceptedAt is { } lastAcceptedAt && now - lastAcceptedAt < _minimumInterval)
+            {
+                return;
+            }
+
+            _lastAcceptedAt = now;
+            _pending = 1;
         }
 
         try
@@ -28,6 +49,10 @@ public sealed class RefreshCoordinator : IAsyncDisposable
         }
         catch (ObjectDisposedException)
         {
+            lock (_requestSync)
+            {
+                _pending = 0;
+            }
         }
     }
 
@@ -56,7 +81,10 @@ public sealed class RefreshCoordinator : IAsyncDisposable
         while (true)
         {
             await _signal.WaitAsync(_cancellation.Token);
-            Interlocked.Exchange(ref _pending, 0);
+            lock (_requestSync)
+            {
+                _pending = 0;
+            }
             await _refresh(_cancellation.Token);
         }
     }

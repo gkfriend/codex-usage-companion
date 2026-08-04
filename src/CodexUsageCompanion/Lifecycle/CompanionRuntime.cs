@@ -29,14 +29,14 @@ public sealed class CompanionRuntime : IAsyncDisposable
     {
         _lease = lease;
         _window = new UsageOverlayWindow(settings, text);
-        _refreshCoordinator = new RefreshCoordinator(RefreshUsageAsync);
+        _refreshCoordinator = new RefreshCoordinator(RefreshUsageAsync, RefreshPolicy.MinimumInterval);
         _windowTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromSeconds(1)
         };
         _fallbackRefreshTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
-            Interval = TimeSpan.FromMinutes(1)
+            Interval = RefreshPolicy.MinimumInterval
         };
         _windowTimer.Tick += HandleWindowTimer;
         _fallbackRefreshTimer.Tick += HandleFallbackRefresh;
