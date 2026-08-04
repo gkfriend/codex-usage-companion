@@ -11,7 +11,19 @@ public static class RateLimitParser
     {
         using var document = JsonDocument.Parse(json);
         var result = document.RootElement.GetProperty("result");
-        var limits = SelectSnapshot(result, out var allowLegacyPositionFallback);
+        return ParseContainer(result);
+    }
+
+    public static RateLimitState ParseNotification(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        var parameters = document.RootElement.GetProperty("params");
+        return ParseContainer(parameters);
+    }
+
+    private static RateLimitState ParseContainer(JsonElement container)
+    {
+        var limits = SelectSnapshot(container, out var allowLegacyPositionFallback);
         var primary = ParseWindow(limits, "primary");
         var secondary = ParseWindow(limits, "secondary");
         var fiveHour = FindWindow(primary, secondary, FiveHourDurationMins);
@@ -30,7 +42,7 @@ public static class RateLimitParser
             }
         }
 
-        var credits = ParseResetCredits(result);
+        var credits = ParseResetCredits(container);
         return new RateLimitState(fiveHour, weekly, credits);
     }
 

@@ -7,6 +7,35 @@ namespace CodexUsageCompanion.Tests;
 public sealed class RateLimitParserTests
 {
     [Fact]
+    public void ParseNotificationReadsRateLimitStateFromParams()
+    {
+        const string json = """
+        {
+          "method": "account/rateLimits/updated",
+          "params": {
+            "rateLimits": {
+              "primary": {
+                "usedPercent": 42,
+                "windowDurationMins": 10080,
+                "resetsAt": 1784247424
+              },
+              "secondary": {
+                "usedPercent": 20,
+                "windowDurationMins": 300,
+                "resetsAt": 1783697624
+              }
+            }
+          }
+        }
+        """;
+
+        var state = RateLimitParser.ParseNotification(json);
+
+        Assert.Equal(80, state.FiveHour?.RemainingPercent);
+        Assert.Equal(58, state.Weekly?.RemainingPercent);
+    }
+
+    [Fact]
     public void ParseResponsePrefersCodexBucketAndClassifiesWindowsByDuration()
     {
         const string json = """

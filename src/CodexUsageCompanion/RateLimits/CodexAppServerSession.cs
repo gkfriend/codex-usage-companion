@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.Json;
+using CodexUsageCompanion.Diagnostics;
 
 namespace CodexUsageCompanion.RateLimits;
 
@@ -20,7 +21,7 @@ public sealed class CodexAppServerSession : IAsyncDisposable
         _requestTimeout = requestTimeout ?? TimeSpan.FromSeconds(8);
     }
 
-    public event Action? RateLimitsChanged;
+    public event Action<RateLimitState>? RateLimitsChanged;
 
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -86,11 +87,20 @@ public sealed class CodexAppServerSession : IAsyncDisposable
         }
     }
 
-    private void HandleNotification(string method)
+    private void HandleNotification(string method, string json)
     {
-        if (method == "account/rateLimits/updated")
+        if (method != "account/rateLimits/updated")
         {
-            RateLimitsChanged?.Invoke();
+            return;
+        }
+
+        try
+        {
+            RateLimitsChanged?.Invoke(RateLimitParser.ParseNotification(json));
+        }
+        catch (Exception exception)
+        {
+            CompanionLog.Shared.Write("rate-limit-notification", exception);
         }
     }
 }

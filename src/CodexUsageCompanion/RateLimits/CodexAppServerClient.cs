@@ -17,7 +17,7 @@ public sealed class CodexAppServerClient : IAsyncDisposable
         _findExecutable = findExecutable ?? CodexExecutableLocator.Find;
     }
 
-    public event Action? RateLimitsChanged;
+    public event Action<RateLimitState>? RateLimitsChanged;
 
     public async Task<RateLimitState> ReadRateLimitsAsync(CancellationToken cancellationToken)
     {
@@ -157,8 +157,8 @@ public sealed class CodexAppServerClient : IAsyncDisposable
         _stderrDrain = null;
     }
 
-    private void HandleRateLimitsChanged()
+    private void HandleRateLimitsChanged(RateLimitState state)
     {
-        RateLimitsChanged?.Invoke();
+        RateLimitsChanged?.Invoke(state);
     }
 }

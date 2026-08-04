@@ -21,19 +21,21 @@ public sealed class CodexAppServerSessionTests
     {
         const string responses = """
         {"id":1,"result":{"userAgent":"test"}}
-        {"method":"account/rateLimits/updated","params":{"rateLimits":{"primary":{"usedPercent":20}}}}
+        {"method":"account/rateLimits/updated","params":{"rateLimits":{"primary":{"usedPercent":42,"windowDurationMins":10080},"secondary":{"usedPercent":20,"windowDurationMins":300}}}}
         {"id":2,"result":{"rateLimits":{"primary":{"usedPercent":49,"windowDurationMins":300}}}}
         """;
         using var reader = new StringReader(responses);
         using var writer = new StringWriter();
         await using var session = new CodexAppServerSession(reader, writer);
-        var updateCount = 0;
-        session.RateLimitsChanged += () => updateCount++;
+        var update = new TaskCompletionSource<RateLimitState>(TaskCreationOptions.RunContinuationsAsynchronously);
+        session.RateLimitsChanged += update.SetResult;
 
         await session.InitializeAsync(CancellationToken.None);
-        await session.ReadRateLimitsAsync(CancellationToken.None);
+        var state = await update.Task.WaitAsync(TimeSpan.FromSeconds(2));
 
-        Assert.Equal(1, updateCount);
+        Assert.Equal(80, state.FiveHour?.RemainingPercent);
+        Assert.Equal(58, state.Weekly?.RemainingPercent);
+        Assert.DoesNotContain("\"method\":\"account/rateLimits/read\"", writer.ToString());
     }
 
     [Fact]

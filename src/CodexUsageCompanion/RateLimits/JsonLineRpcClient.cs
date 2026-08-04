@@ -51,7 +51,7 @@ public sealed class JsonLineRpcConnection : IAsyncDisposable
         _writer = writer;
     }
 
-    public event Action<string>? NotificationReceived;
+    public event Action<string, string>? NotificationReceived;
 
     public async Task<string> SendRequestAsync(
         long id,
@@ -155,7 +155,7 @@ public sealed class JsonLineRpcConnection : IAsyncDisposable
 
                 if (root.TryGetProperty("method", out var method) && method.ValueKind == JsonValueKind.String)
                 {
-                    NotificationReceived?.Invoke(method.GetString()!);
+                    NotificationReceived?.Invoke(method.GetString()!, line);
                 }
             }
         }

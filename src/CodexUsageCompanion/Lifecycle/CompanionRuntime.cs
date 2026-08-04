@@ -139,12 +139,21 @@ public sealed class CompanionRuntime : IAsyncDisposable
         _refreshCoordinator.Request();
     }
 
-    private void HandleRateLimitsChanged()
+    private void HandleRateLimitsChanged(RateLimitState state)
     {
-        var application = _application;
-        if (application is not null)
+        _ = ApplyRateLimitsChangedAsync(state);
+    }
+
+    private async Task ApplyRateLimitsChangedAsync(RateLimitState state)
+    {
+        try
         {
-            _refreshCoordinator.Request();
+            await UpdateWindowAsync(state);
+            _hasUsageState = true;
+        }
+        catch (Exception exception)
+        {
+            CompanionLog.Shared.Write("rate-limit-notification", exception);
         }
     }
 
