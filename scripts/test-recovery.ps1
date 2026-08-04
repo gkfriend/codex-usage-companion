@@ -20,7 +20,7 @@ $temporaryRoot = Join-Path ([System.IO.Path]::GetTempPath()) "CodexUsageCompanio
 $profile = Join-Path $temporaryRoot 'profile'
 $localAppData = Join-Path $temporaryRoot 'local'
 $sourceExecutable = Join-Path $profile 'plugins\codex-usage-companion\bin\win-x64\CodexUsageCompanion.exe'
-$cacheExecutable = Join-Path $profile '.codex\plugins\cache\personal\codex-usage-companion\0.3.5\bin\win-x64\CodexUsageCompanion.exe'
+$cacheExecutable = Join-Path $profile '.codex\plugins\cache\personal\codex-usage-companion\0.3.6\bin\win-x64\CodexUsageCompanion.exe'
 
 try {
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $sourceExecutable),(Split-Path -Parent $cacheExecutable) | Out-Null
@@ -68,8 +68,8 @@ try {
         if ($task.Actions.Arguments -notlike '*//B*') {
             throw 'Scheduled task does not suppress Windows Script Host dialogs.'
         }
-        if ($task.Triggers.Repetition.Interval -ne 'PT3M') {
-            throw "Scheduled task interval must be PT3M but is '$($task.Triggers.Repetition.Interval)'."
+        if ($task.Triggers.Repetition.Interval -ne 'PT5M') {
+            throw "Scheduled task interval must be PT5M but is '$($task.Triggers.Repetition.Interval)'."
         }
     }
 

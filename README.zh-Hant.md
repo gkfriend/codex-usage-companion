@@ -12,8 +12,9 @@ Codex Usage Companion 是開放原始碼 Windows 外掛，會在 Codex Desktop �
 
 ## 功能
 
-- 送出訊息時與 Codex 回覆後都會更新，並透過本機通知與每三分鐘備援更新保持資料同步。
-- 從 v0.3.5 開始，獨立且不顯示視窗的 Windows 排程檢查會在 Codex 重新啟動或常駐程序退出後約三分鐘內恢復外掛，即使 Codex Hook 沒有執行也能恢復。
+- 直接套用 app-server 的即時使用量通知，並且最多每五分鐘進行一次備援查詢；重複的提示與回覆 Hook 會合併，不會額外查詢。
+- 從 v0.3.6 開始，獨立且不顯示視窗的 Windows 排程檢查會在 Codex 重新啟動或常駐程序退出後約五分鐘內恢復外掛，即使 Codex Hook 沒有執行也能恢復。
+- Codex CLI 觸發外掛 Hook 時會回傳有效 JSON 並安全結束；Codex Desktop 關閉時不會啟動桌面外掛。
 - Codex 關閉時不會保留額外監控程序；每次排程檢查完成後立即退出。
 - 永遠只保留一個常駐程序，不會出現在工作列、Alt+Tab 或系統匣。
 - 面板會跟隨 Codex 視窗；Codex 最小化時隱藏，Codex 關閉後自動結束。
@@ -59,7 +60,7 @@ codex plugin marketplace add gkfriend/codex-usage-companion
 powershell -ExecutionPolicy Bypass -File .\scripts\install-recovery.ps1
 ```
 
-這會建立目前使用者專用的隱藏排程 `\CodexUsageCompanion\Recovery`、立即啟動，並透過不顯示主控台的 Windows Script Host 啟動器每三分鐘檢查一次。不需要系統管理員權限，也不會留下常駐 PowerShell 程序；原有 Hook 仍負責即時啟動與更新。
+這會建立目前使用者專用的隱藏排程 `\CodexUsageCompanion\Recovery`、立即啟動，並透過不顯示主控台的 Windows Script Host 啟動器每五分鐘檢查一次。不需要系統管理員權限，也不會留下常駐 PowerShell 程序；原有 Hook 仍負責輕量的啟動與更新通知。
 
 若只想移除自動恢復，但保留外掛、設定與記錄檔：
 
